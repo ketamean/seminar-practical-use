@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="outerMargin">10dp</dimen>
+    <dimen name="headerSize">20sp</dimen>
+    <dimen name="textboxPadding">10dp</dimen>
+</resources>
