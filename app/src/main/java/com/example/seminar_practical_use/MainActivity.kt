@@ -56,43 +56,43 @@ class MainActivity : AppCompatActivity() {
 
         return res
     }
-    private fun checkBiometricAvailability() {
-        val status = biometricHelper.checkBiometricCapability(this)
-        val statusMessage = when (status) {  // Use when as an expression for conciseness.
-            BiometricHelper.BiometricStatus.AVAILABLE -> ""
-            BiometricHelper.BiometricStatus.NO_HARDWARE -> "Biometric authentication is not available on this device"
-            BiometricHelper.BiometricStatus.UNAVAILABLE -> "Biometric authentication is currently unavailable"
-            BiometricHelper.BiometricStatus.NOT_ENROLLED -> "Please enroll your biometric first"
-            BiometricHelper.BiometricStatus.UNKNOWN -> "Biometric authentication status is unknown"
-        }
-
-        if (statusMessage.isNotEmpty()) { // Use isNotEmpty for clarity.
-            Toast.makeText(this, statusMessage, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun setUpBiometricHelper() {
-        biometricHelper.setupBiometricAuthentication(
-            title = "Unlock your note",
-            subtitle = "Please unlock to read the note",
-            description = "Confirm your biometric to continue",
-            allowDeviceCredential = true,
-            onResult = { result ->  // Use named parameters for clarity
-                when (result) {
-                    is BiometricHelper.AuthResult.Success -> {
-
-                    }
-                    is BiometricHelper.AuthResult.Error -> {
-                        Toast.makeText(this, "Error while unlocking", Toast.LENGTH_SHORT).show()
-                    }
-                    is BiometricHelper.AuthResult.Failure -> {
-                        Toast.makeText(this, "Please use correct password to unlock", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        )
-        checkBiometricAvailability()
-    }
+//    private fun checkBiometricAvailability() {
+//        val status = biometricHelper.checkBiometricCapability(this)
+//        val statusMessage = when (status) {  // Use when as an expression for conciseness.
+//            BiometricHelper.BiometricStatus.AVAILABLE -> ""
+//            BiometricHelper.BiometricStatus.NO_HARDWARE -> "Biometric authentication is not available on this device"
+//            BiometricHelper.BiometricStatus.UNAVAILABLE -> "Biometric authentication is currently unavailable"
+//            BiometricHelper.BiometricStatus.NOT_ENROLLED -> "Please enroll your biometric first"
+//            BiometricHelper.BiometricStatus.UNKNOWN -> "Biometric authentication status is unknown"
+//        }
+//
+//        if (statusMessage.isNotEmpty()) { // Use isNotEmpty for clarity.
+//            Toast.makeText(this, statusMessage, Toast.LENGTH_SHORT).show()
+//        }
+//    }
+//
+//    private fun setUpBiometricHelper() {
+//        biometricHelper.setupBiometricAuthentication(
+//            title = "Unlock your note",
+//            subtitle = "Please unlock to read the note",
+//            description = "Confirm your biometric to continue",
+//            allowDeviceCredential = true,
+//            onResult = { result ->  // Use named parameters for clarity
+//                when (result) {
+//                    is BiometricHelper.AuthResult.Success -> {
+//
+//                    }
+//                    is BiometricHelper.AuthResult.Error -> {
+//                        Toast.makeText(this, "Error while unlocking", Toast.LENGTH_SHORT).show()
+//                    }
+//                    is BiometricHelper.AuthResult.Failure -> {
+//                        Toast.makeText(this, "Please use correct password to unlock", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//        )
+//        checkBiometricAvailability()
+//    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -105,23 +105,22 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.noteList)
         data = mutableListOf()
-//        cryptoManager.delKey()
+        cryptoManager.delKey()
         CoroutineScope(Dispatchers.Main).launch {
             val database = NoteDatabase.getInstance(this@MainActivity)
-//            val sampleData = genSampleData()
-//            database.NoteDao().deleteAllNotes()
-//            sampleData.forEach {
-//                if (it.isLocked) {
-//                    val encrData = cryptoManager.encrypt(it.content)
-//                    Log.d("TTT check", "${it.id} && ${encrData.data.decodeToString()}")
-//                    it.content = encrData.data
-//                    it.initVector = encrData.iv
-//                }
-//                database.NoteDao().insertNote(it)
-//            }
+            val sampleData = genSampleData()
+            database.NoteDao().deleteAllNotes()
+            sampleData.forEach {
+                if (it.isLocked) {
+                    val encrData = cryptoManager.encrypt(it.content)
+                    Log.d("TTT check", "${it.id} && ${encrData.data.decodeToString()}")
+                    it.content = encrData.data
+                    it.initVector = encrData.iv
+                }
+                database.NoteDao().insertNote(it)
+            }
 
-            val tempData = database.NoteDao().getAllNotes()
-            data.addAll(tempData)
+            data.addAll(database.NoteDao().getAllNotes())
             database.close()
             setupRecyclerView()
         }

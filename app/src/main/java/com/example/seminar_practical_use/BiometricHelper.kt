@@ -65,7 +65,6 @@ class BiometricHelper(private val activity: FragmentActivity) {
                 super.onAuthenticationFailed()
                 onResult(AuthResult.Failure)
             }
-
         })
 
         val promptBuilder = BiometricPrompt.PromptInfo.Builder()
@@ -75,7 +74,7 @@ class BiometricHelper(private val activity: FragmentActivity) {
 
 
         if (allowDeviceCredential) { // change to allow face and fingerprint
-            promptBuilder.setAllowedAuthenticators(BIOMETRIC_STRONG or BIOMETRIC_WEAK or DEVICE_CREDENTIAL)
+            promptBuilder.setAllowedAuthenticators(BIOMETRIC_WEAK or DEVICE_CREDENTIAL) // BIOMETRIC_STRONG or
         } else {
             promptBuilder.setNegativeButtonText("Cancel")
             promptBuilder.setAllowedAuthenticators(BIOMETRIC_STRONG or BIOMETRIC_WEAK)

@@ -85,6 +85,32 @@ class NoteEdit : AppCompatActivity() {
             }
         })
 
+        findViewById<ImageButton>(R.id.btnAddLock).setOnClickListener {
+            if (note == null) return@setOnClickListener
+            isLocked = !isLocked
+            val database = NoteDatabase.getInstance(this)
+            if (isLocked) {
+                val encryptedData = CryptoManager().encrypt(edtContent?.text.toString().toByteArray())
+                val newNote = Note(edtHeader?.text.toString(), encryptedData.data, true, encryptedData.iv)
+                newNote.id = note?.id as Int
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    database.NoteDao().updateNote(newNote)
+                }.invokeOnCompletion {
+                    displayNoteOnLoad(newNote.id)
+                }
+            } else {
+                val newNote = Note( edtHeader?.text.toString(), edtContent?.text.toString().toByteArray(), false, byteArrayOf() )
+                newNote.id = note?.id as Int
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    database.NoteDao().updateNote(newNote)
+                }.invokeOnCompletion {
+                    displayNoteOnLoad(newNote.id)
+                }
+            }
+        }
+
         edtContent = findViewById(R.id.content)
         edtHeader = findViewById(R.id.header)
         btnLock = findViewById(R.id.btnLock)
@@ -97,6 +123,10 @@ class NoteEdit : AppCompatActivity() {
             cacheUnlocked = !cacheUnlocked;
         }
 
+        displayNoteOnLoad(noteid)
+    }
+
+    private fun displayNoteOnLoad(noteid: Int) {
         if (noteid == -1) {
             // no note was given --> create new note
         } else {
